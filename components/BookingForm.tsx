@@ -1,7 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { areaLabel, checkPincode } from '@/lib/delivery';
+import {
+  FREE_RADIUS_KM,
+  MAX_RADIUS_KM,
+  PER_KM,
+  quote,
+  quoteSentence,
+  rupees
+} from '@/lib/delivery';
 
 const STORAGE_KEY = 'nestloop-pincode';
 const WARRANTY_PRICE = 499;
@@ -17,8 +24,8 @@ type Props = {
 
 /**
  * The booking form from the design. Until Razorpay keys exist the submit hands
- * everything to WhatsApp rather than taking money, because a reservation with
- * no payment behind it would let the same unit be promised twice.
+ * everything to WhatsApp rather than taking money: a reservation with no
+ * payment behind it would let the same unit be promised twice.
  */
 export default function BookingForm({
   productCode,
@@ -45,16 +52,21 @@ export default function BookingForm({
     }
   }, []);
 
-  const area = checkPincode(pincode);
+  const q = quote(pincode);
   const slots = nextTwoDays();
-  const total = salePrice + (warranty ? WARRANTY_PRICE : 0);
+
+  const deliveryFee = q.state === 'quoted' ? q.fee : 0;
+  const deliveryUnknown = q.state === 'unknown';
+  const goods = salePrice + (warranty ? WARRANTY_PRICE : 0);
+  const total = goods + deliveryFee;
   const balance = total - advance;
 
+  const servable = q.state === 'quoted' || q.state === 'unknown';
   const ready =
     name.trim().length > 1 &&
     phone.replace(/\D/g, '').length >= 10 &&
     address.trim().length > 5 &&
-    area.state === 'inside';
+    servable;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -66,16 +78,27 @@ export default function BookingForm({
       '',
       title,
       `Code: ${productCode}`,
-      `Price: Rs ${total.toLocaleString('en-IN')}${warranty ? ' (incl. Rs 499 warranty)' : ''}`,
-      `Advance: Rs ${advance.toLocaleString('en-IN')}`,
-      `Balance on delivery: Rs ${balance.toLocaleString('en-IN')}`,
+      `Unit price: ${rupees(salePrice)}`
+    ];
+    if (warranty) lines.push(`Warranty, 6 months: ${rupees(WARRANTY_PRICE)}`);
+    lines.push(
+      deliveryUnknown
+        ? 'Delivery: to be confirmed'
+        : deliveryFee === 0
+          ? 'Delivery: free'
+          : `Delivery: ${rupees(deliveryFee)}`
+    );
+    lines.push(
+      `Total: ${rupees(total)}${deliveryUnknown ? ' plus delivery' : ''}`,
+      `Advance: ${rupees(advance)}`,
+      `Balance on delivery: ${rupees(balance)}${deliveryUnknown ? ' plus delivery' : ''}`,
       '',
       `Name: ${name.trim()}`,
       `Phone: ${phone.trim()}`,
       `Address: ${address.trim()}`,
       `Pincode: ${pincode}`,
       `Preferred delivery: ${slots[slot].long}`
-    ];
+    );
 
     window.open(
       `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(lines.join('\n'))}`,
@@ -130,20 +153,19 @@ export default function BookingForm({
           value={pincode}
           onChange={(e) => setPincode(e.target.value)}
         />
-        {area.state === 'inside' && (
-          <span className="field-note good">
-            <Tick /> {areaLabel(area)} is inside our delivery area
+        {q.state !== 'empty' && (
+          <span className={`field-note ${tone(q.state, deliveryFee)}`}>
+            {q.state === 'quoted' && deliveryFee === 0 && <Tick />}
+            {quoteSentence(q)}
           </span>
         )}
-        {area.state === 'outside' && (
-          <span className="field-note bad">
-            {pincode} is outside the 20 km area. You can still collect from the godown
-            in Vennala: message us and we will arrange it.
-          </span>
+        {touched && q.state === 'empty' && (
+          <span className="field-note bad">We need your pincode to price delivery</span>
         )}
-        {touched && area.state !== 'inside' && area.state !== 'outside' && (
-          <span className="field-note bad">A six digit pincode, please</span>
-        )}
+        <span className="field-help">
+          Free within {FREE_RADIUS_KM} km of the Eroor godown, then {rupees(PER_KM)} a
+          km, up to {MAX_RADIUS_KM} km.
+        </span>
       </div>
 
       <div className="field">
@@ -182,10 +204,20 @@ export default function BookingForm({
       )}
 
       <div className="totals">
-        <Row k="Unit price" v={salePrice} />
-        {warranty && <Row k="Warranty, 6 months" v={WARRANTY_PRICE} />}
-        <Row k="Advance now" v={advance} />
-        <Row k="Balance on delivery" v={balance} strong />
+        <Row k="Unit price" v={rupees(salePrice)} />
+        {warranty && <Row k="Warranty, 6 months" v={rupees(WARRANTY_PRICE)} />}
+        <Row
+          k={q.state === 'quoted' && q.fee > 0 ? `Delivery, ${q.km} km` : 'Delivery'}
+          v={
+            deliveryUnknown
+              ? 'Confirmed on WhatsApp'
+              : deliveryFee === 0
+                ? 'Free'
+                : rupees(deliveryFee)
+          }
+        />
+        <Row k="Advance now" v={rupees(advance)} />
+        <Row k="Balance on delivery" v={rupees(balance)} strong />
       </div>
 
       <button type="submit" className="btn btn-block" disabled={touched && !ready}>
@@ -201,11 +233,17 @@ export default function BookingForm({
   );
 }
 
-function Row({ k, v, strong }: { k: string; v: number; strong?: boolean }) {
+function tone(state: string, fee: number): string {
+  if (state === 'quoted') return fee === 0 ? 'good' : 'warn';
+  if (state === 'too-far' || state === 'invalid') return 'bad';
+  return '';
+}
+
+function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
   return (
     <div className={strong ? 'total-row strong' : 'total-row'}>
       <span>{k}</span>
-      <span>Rs {v.toLocaleString('en-IN')}</span>
+      <span>{v}</span>
     </div>
   );
 }
@@ -269,7 +307,7 @@ function Tick() {
   );
 }
 
-/** Tomorrow and the day after, which is the realistic delivery window. */
+/** Tomorrow and the day after, the realistic delivery window. */
 function nextTwoDays() {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [

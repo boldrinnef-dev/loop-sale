@@ -146,7 +146,7 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
           <Specs unit={unit} includedLabels={INCLUDED_LABELS} />
 
           <div className="notes">
-            <Note text={`Delivered across Kochi within 20 km, in 2 to 3 days.`} />
+            <Note text="Free delivery within 15 km of our Eroor godown, Rs 25 a km beyond that, up to 40 km." />
             <Note
               text={`${rupees(advance)} books it. Balance of ${rupees(
                 balance

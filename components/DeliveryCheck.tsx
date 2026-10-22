@@ -1,43 +1,50 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { areaLabel, checkPincode, type DeliveryCheck } from '@/lib/delivery';
+import {
+  FREE_RADIUS_KM,
+  MAX_RADIUS_KM,
+  PER_KM,
+  quote,
+  quoteLabel,
+  quoteSentence,
+  rupees,
+  type DeliveryQuote
+} from '@/lib/delivery';
 
 const STORAGE_KEY = 'nestloop-pincode';
 
 export default function DeliveryCheckControl() {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
-  const [result, setResult] = useState<DeliveryCheck>({ state: 'empty' });
+  const [result, setResult] = useState<DeliveryQuote>({ state: 'empty' });
 
-  // Remembered per browser only. A miss here is cosmetic, never load bearing.
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         setValue(saved);
-        setResult(checkPincode(saved));
+        setResult(quote(saved));
       }
     } catch {
-      /* private window, blocked storage: fall through to the default label */
+      /* private window or blocked storage: the default label is fine */
     }
   }, []);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const next = checkPincode(value);
+    const next = quote(value);
     setResult(next);
-    if (next.state === 'inside' || next.state === 'outside') {
+    if (next.state !== 'empty' && next.state !== 'invalid') {
       try {
         localStorage.setItem(STORAGE_KEY, next.pincode);
       } catch {
         /* ignore */
       }
-      if (next.state === 'inside') setOpen(false);
     }
   }
 
-  const settled = result.state === 'inside';
+  const settled = result.state === 'quoted';
 
   return (
     <div className="delivery">
@@ -56,7 +63,7 @@ export default function DeliveryCheckControl() {
           />
           <circle cx="7" cy="5.3" r="1.5" fill="#0F3B5C" />
         </svg>
-        <span>{settled ? `Delivering to ${areaLabel(result)}` : 'Check delivery'}</span>
+        <span>{settled ? quoteLabel(result) : 'Check delivery'}</span>
         <span className="pill-action">{settled ? 'Change' : 'Pincode'}</span>
       </button>
 
@@ -80,30 +87,22 @@ export default function DeliveryCheckControl() {
             </div>
           </form>
 
-          {result.state === 'invalid' && (
-            <p className="delivery-msg">That is not a six digit pincode.</p>
+          {result.state !== 'empty' && (
+            <p className={`delivery-msg ${toneOf(result)}`}>{quoteSentence(result)}</p>
           )}
 
-          {result.state === 'inside' && (
-            <p className="delivery-msg good">
-              We deliver to {areaLabel(result)}. Two to three days from booking.
-            </p>
-          )}
-
-          {result.state === 'outside' && (
-            <div className="delivery-msg bad">
-              <p>
-                {result.pincode} is outside our 20 km delivery area, so we cannot bring
-                a unit there yet.
-              </p>
-              <p>
-                You can still buy and collect from the godown in Vennala, or message us
-                and we will tell you when we reach your area.
-              </p>
-            </div>
-          )}
+          <p className="delivery-rates">
+            Free within {FREE_RADIUS_KM} km of the Eroor godown. {rupees(PER_KM)} a km
+            after that, up to {MAX_RADIUS_KM} km.
+          </p>
         </div>
       )}
     </div>
   );
+}
+
+function toneOf(q: DeliveryQuote): string {
+  if (q.state === 'quoted') return q.fee === 0 ? 'good' : 'warn';
+  if (q.state === 'too-far' || q.state === 'invalid') return 'bad';
+  return '';
 }
