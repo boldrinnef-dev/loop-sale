@@ -10,7 +10,7 @@ import {
   rupees
 } from '@/lib/delivery';
 
-const STORAGE_KEY = 'nestloop-pincode';
+import { STORAGE_KEY } from '@/lib/delivery-client';
 const WARRANTY_PRICE = 499;
 
 type Props = {

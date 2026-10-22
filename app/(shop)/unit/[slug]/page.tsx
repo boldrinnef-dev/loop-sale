@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import DeliveryLine from '@/components/DeliveryLine';
 import { imageUrl, sanityConfigured } from '@/lib/sanity';
 import { SAMPLE_UNITS } from '@/lib/sample';
 import {
@@ -125,6 +126,7 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
                 </span>
               )}
             </div>
+            <DeliveryLine salePrice={unit.salePrice} />
           </div>
 
           {unit.conditionNote && (
@@ -146,7 +148,6 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
           <Specs unit={unit} includedLabels={INCLUDED_LABELS} />
 
           <div className="notes">
-            <Note text="Free delivery within 15 km of our Eroor godown, Rs 25 a km beyond that, up to 40 km." />
             <Note
               text={`${rupees(advance)} books it. Balance of ${rupees(
                 balance

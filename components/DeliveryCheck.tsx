@@ -12,7 +12,7 @@ import {
   type DeliveryQuote
 } from '@/lib/delivery';
 
-const STORAGE_KEY = 'nestloop-pincode';
+import { announcePincode, STORAGE_KEY } from '@/lib/delivery-client';
 
 export default function DeliveryCheckControl() {
   const [open, setOpen] = useState(false);
@@ -41,6 +41,7 @@ export default function DeliveryCheckControl() {
       } catch {
         /* ignore */
       }
+      announcePincode();
     }
   }
 

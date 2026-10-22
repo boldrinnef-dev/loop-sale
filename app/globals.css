@@ -1015,3 +1015,33 @@ a:hover {
   line-height: 1.5;
   color: var(--muted);
 }
+
+.delivery-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.delivery-line svg {
+  position: relative;
+  top: 1px;
+}
+.delivery-line.good {
+  color: var(--green);
+  font-weight: 600;
+}
+.delivery-line.warn {
+  color: #8a4b12;
+  font-weight: 600;
+}
+.delivery-line.bad {
+  color: #9a3412;
+}
+.delivery-line-total {
+  color: var(--ink);
+  font-weight: 700;
+}
