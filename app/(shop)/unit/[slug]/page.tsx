@@ -167,9 +167,9 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
             <strong>{available ? rupees(advance) : rupees(unit.salePrice)}</strong>
           </div>
           {available ? (
-            <a className="btn" href={whatsappLink(unit)} target="_blank" rel="noopener">
-              Book on WhatsApp
-            </a>
+            <Link className="btn" href={`/book/${unit.slug}`}>
+              Reserve this unit
+            </Link>
           ) : (
             <span className="btn is-disabled">No longer available</span>
           )}
