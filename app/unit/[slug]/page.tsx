@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { imageUrl, sanityConfigured } from '@/lib/sanity';
+import { SAMPLE_UNITS } from '@/lib/sample';
 import {
   categoryLabel,
   discountPercent,
@@ -23,14 +24,18 @@ const INCLUDED_LABELS: Record<string, string> = {
   stabiliser: 'Stabiliser'
 };
 
+async function resolveUnit(slug: string): Promise<Unit | null> {
+  if (sanityConfigured) return getUnit(slug);
+  return SAMPLE_UNITS.find((u) => u.slug === slug) ?? null;
+}
+
 export async function generateMetadata({
   params
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  if (!sanityConfigured) return { title: 'Nestloop Shop' };
   const { slug } = await params;
-  const unit = await getUnit(slug);
+  const unit = await resolveUnit(slug);
   if (!unit) return { title: 'Unit not found, Nestloop Shop' };
   return {
     title: `${unit.title}, ${rupees(unit.salePrice)}, Nestloop Shop`,
@@ -39,10 +44,8 @@ export async function generateMetadata({
 }
 
 export default async function UnitPage({ params }: { params: Promise<{ slug: string }> }) {
-  if (!sanityConfigured) notFound();
-
   const { slug } = await params;
-  const unit = await getUnit(slug);
+  const unit = await resolveUnit(slug);
   if (!unit || unit.status === 'draft' || unit.status === 'withdrawn') notFound();
 
   const available = unit.status === 'available';
@@ -74,7 +77,7 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
             {main ? (
               <img src={main} alt={unit.images?.[0]?.alt || unit.title} />
             ) : (
-              <span className="mono photo-note">NO PHOTO</span>
+              <span className="mono photo-note">PHOTO PENDING</span>
             )}
             {!available && (
               <span className="badge sold">
@@ -132,7 +135,7 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
                   {defect ? (
                     <img src={defect} alt="Close up of the marks on this unit" />
                   ) : (
-                    <span className="mono photo-note">NO DEFECT PHOTO</span>
+                    <span className="mono photo-note">DEFECT<br />PHOTO</span>
                   )}
                 </div>
                 <p>{unit.conditionNote}</p>

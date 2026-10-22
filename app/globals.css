@@ -573,6 +573,25 @@ a:hover {
   padding: 1px 5px;
 }
 
+.notice {
+  margin: 16px 0 0;
+  padding: 11px 14px;
+  border: 1px solid #e4d4a8;
+  background: #fdf8ec;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.notice code {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  background: #fff;
+  border: 1px solid #e8dcbe;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
 .footer {
   border-top: 1px solid var(--line);
   background: var(--card);

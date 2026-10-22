@@ -2,6 +2,7 @@ import Link from 'next/link';
 import SetupNotice from '@/components/SetupNotice';
 import UnitCard from '@/components/UnitCard';
 import { sanityConfigured } from '@/lib/sanity';
+import { SAMPLE_UNITS } from '@/lib/sample';
 import { CATEGORIES, getCatalog } from '@/lib/units';
 
 export const revalidate = 60;
@@ -13,16 +14,7 @@ export default async function CatalogPage({
 }) {
   const { c } = await searchParams;
 
-  if (!sanityConfigured) {
-    return (
-      <main>
-        <Hero />
-        <SetupNotice />
-      </main>
-    );
-  }
-
-  const all = await getCatalog();
+  const all = sanityConfigured ? await getCatalog() : SAMPLE_UNITS;
   const present = CATEGORIES.filter((cat) => all.some((u) => u.category === cat.value));
   const active = c && present.some((p) => p.value === c) ? c : null;
   const units = active ? all.filter((u) => u.category === active) : all;
@@ -31,6 +23,8 @@ export default async function CatalogPage({
   return (
     <main>
       <Hero />
+
+      {!sanityConfigured && <SetupNotice />}
 
       {present.length > 0 && (
         <nav className="chips" aria-label="Filter by category">

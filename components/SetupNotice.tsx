@@ -1,23 +1,16 @@
 /**
- * Shown instead of the catalog until the Sanity project is wired up, so a fresh
- * deploy explains itself rather than rendering an empty page.
+ * Thin banner shown above the sample catalog until the Sanity project is wired
+ * up, so a fresh deploy explains itself without hiding the layout.
  */
 export default function SetupNotice() {
   return (
     <div className="wrap">
-      <div className="empty">
-        <h2>Not connected to Sanity yet</h2>
-        <p>
-          Set <code>NEXT_PUBLIC_SANITY_PROJECT_ID</code> and{' '}
-          <code>NEXT_PUBLIC_SANITY_DATASET</code> in the Vercel project, then redeploy.
-          Both values come from the existing nestloop.in Sanity project and are safe to
-          expose in the browser.
-        </p>
-        <p>
-          The catalog reads documents of type <code>resaleUnit</code>. That schema lives
-          in <code>sanity/resaleUnit.ts</code> in this repo and needs registering in the
-          Studio before anything shows up here.
-        </p>
+      <div className="notice">
+        <strong>Sample stock.</strong> Set <code>NEXT_PUBLIC_SANITY_PROJECT_ID</code> in
+        the Vercel project and redeploy to show real units. The catalog reads documents
+        of type <code>resaleUnit</code>, the schema for which is in{' '}
+        <code>sanity/resaleUnit.ts</code> in this repo and needs registering in the
+        Studio.
       </div>
     </div>
   );

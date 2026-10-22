@@ -13,7 +13,7 @@ export default function UnitCard({ unit }: { unit: Unit }) {
         {src ? (
           <img src={src} alt={unit.images?.[0]?.alt || unit.title} loading="lazy" />
         ) : (
-          <span className="mono photo-note">NO PHOTO</span>
+          <span className="mono photo-note">PHOTO PENDING</span>
         )}
 
         {gone ? (
