@@ -52,29 +52,42 @@ const FIELDS = `
   "defectImage": defectImage.asset._ref
 `;
 
-const SOLD_VISIBLE_DAYS = 3;
-
 /**
- * Everything a shopper may see: live stock, plus units sold or reserved in the
- * last few days so the catalog visibly moves. Draft and withdrawn never leave
- * the Studio.
+ * How far back sold units stay on the page. Longer than you would use on a
+ * normal shop on purpose: an empty catalog looks like a dead business, and
+ * recently sold stock is the clearest proof that units actually move.
  */
-export async function getCatalog(): Promise<Unit[]> {
+const SOLD_VISIBLE_DAYS = 30;
+
+export type Catalog = {
+  /** Buyable right now. */
+  available: Unit[];
+  /** Gone, kept visible as proof the stock turns over. */
+  recentlySold: Unit[];
+};
+
+export async function getCatalog(): Promise<Catalog> {
   const units = await sanityFetch<Unit[]>(
     `*[_type == "resaleUnit" && status in ["available", "reserved", "sold"]]
       | order(listedAt desc) { ${FIELDS} }`
   );
-  if (!units) return [];
+  if (!units) return { available: [], recentlySold: [] };
 
   const cutoff = Date.now() - SOLD_VISIBLE_DAYS * 24 * 60 * 60 * 1000;
 
-  return units
-    .filter((unit) => {
-      if (unit.status === 'available') return true;
-      if (!unit.soldAt) return true;
-      return new Date(unit.soldAt).getTime() > cutoff;
-    })
-    .sort((a, b) => Number(a.status !== 'available') - Number(b.status !== 'available'));
+  const available = units.filter((u) => u.status === 'available');
+
+  const recentlySold = units
+    .filter((u) => u.status !== 'available')
+    // A unit with no soldAt was marked by hand, so keep it rather than hide it.
+    .filter((u) => !u.soldAt || new Date(u.soldAt).getTime() > cutoff)
+    .sort((a, b) => {
+      const at = a.soldAt ? new Date(a.soldAt).getTime() : 0;
+      const bt = b.soldAt ? new Date(b.soldAt).getTime() : 0;
+      return bt - at;
+    });
+
+  return { available, recentlySold };
 }
 
 export async function getUnit(slug: string): Promise<Unit | null> {

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import DeliveryLine from '@/components/DeliveryLine';
+import Gallery from '@/components/Gallery';
 import { imageUrl, sanityConfigured } from '@/lib/sanity';
 import { SAMPLE_UNITS } from '@/lib/sample';
 import {
@@ -53,7 +54,6 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
   const off = discountPercent(unit);
   const advance = unit.advanceAmount ?? 500;
   const balance = unit.salePrice - advance;
-  const main = imageUrl(unit.images?.[0]?.ref, 1000, 750);
   const defect = imageUrl(unit.defectImage, 280, 280);
 
   return (
@@ -73,35 +73,11 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
       </Link>
 
       <div className="unit-layout">
-        <div className="gallery">
-          <div className="gallery-main">
-            {main ? (
-              <img src={main} alt={unit.images?.[0]?.alt || unit.title} />
-            ) : (
-              <span className="mono photo-note">PHOTO PENDING</span>
-            )}
-            {!available && (
-              <span className="badge sold">
-                {unit.status === 'sold' ? 'SOLD' : 'RESERVED'}
-              </span>
-            )}
-          </div>
-
-          {unit.images && unit.images.length > 1 && (
-            <div className="thumbs">
-              {unit.images.map((shot, i) => {
-                const src = imageUrl(shot.ref, 160, 160);
-                return (
-                  <div className="thumb" key={`${shot.ref}-${i}`}>
-                    {src ? (
-                      <img src={src} alt={shot.alt || shot.shotType || `Photo ${i + 1}`} />
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        <Gallery
+          images={unit.images ?? []}
+          title={unit.title}
+          sold={available ? null : unit.status === 'sold' ? 'SOLD' : 'RESERVED'}
+        />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="unit-head">

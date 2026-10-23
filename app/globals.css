@@ -1045,3 +1045,62 @@ a:hover {
   color: var(--ink);
   font-weight: 700;
 }
+
+/* Clickable gallery */
+.thumb {
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  transition: outline-color 0.12s;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+.thumb:hover {
+  outline-color: var(--line-strong);
+}
+.thumb[aria-current='true'] {
+  outline-color: var(--ink);
+}
+.gallery-count {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(22, 25, 28, 0.78);
+  color: #fff;
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+/* Recently sold */
+.sold-section {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.sold-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.sold-head h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.sold-head span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.btn-inline {
+  display: inline-flex;
+  flex: none;
+  min-height: 46px;
+  padding: 0 20px;
+  font-size: 14px;
+}
