@@ -1104,3 +1104,41 @@ a:hover {
   padding: 0 20px;
   font-size: 14px;
 }
+
+/* Gallery arrows */
+.gallery-main {
+  touch-action: pan-y;
+  user-select: none;
+}
+.gallery-main img {
+  -webkit-user-drag: none;
+}
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  box-shadow: 0 1px 6px rgba(22, 25, 28, 0.22);
+  cursor: pointer;
+  padding: 0;
+}
+.gallery-arrow:hover {
+  background: #fff;
+}
+.gallery-arrow:active {
+  transform: translateY(-50%) scale(0.94);
+}
+.gallery-arrow.prev {
+  left: 10px;
+}
+.gallery-arrow.next {
+  right: 10px;
+}
