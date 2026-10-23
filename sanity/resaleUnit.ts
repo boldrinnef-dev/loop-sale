@@ -31,7 +31,7 @@ export const resaleUnit = defineType({
       type: 'string',
       group: 'identity',
       description:
-        'Exactly as on the sticker, including the funding prefix. Example: KRI001/NLKOCFD032 or NLKOCWM118.',
+        'Resale codes run NL-SL-<type>-<number>. Example: NL-SL-WM-0035 for a washing machine, NL-SL-FD-0051 for a fridge. Use the next number in the sequence.',
       validation: (Rule) => Rule.required().min(6),
     }),
     defineField({
