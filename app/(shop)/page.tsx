@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import Banner from '@/components/Banner';
+import CategoryTiles from '@/components/CategoryTiles';
 import Filters, { PRICE_BANDS, type Active } from '@/components/Filters';
 import SetupNotice from '@/components/SetupNotice';
 import UnitCard from '@/components/UnitCard';
 import { sanityConfigured } from '@/lib/sanity';
 import { SAMPLE_UNITS } from '@/lib/sample';
-import { CATEGORIES, getCatalog, type Unit } from '@/lib/units';
+import { CATEGORIES, categoryLabel, getCatalog, type Unit } from '@/lib/units';
 
 export const revalidate = 60;
 
@@ -42,27 +44,15 @@ export default async function CatalogPage({
 
   return (
     <main>
-      <Hero />
+      <Banner />
 
       {!sanityConfigured && <SetupNotice />}
 
-      {present.length > 0 && (
-        <nav className="chips" aria-label="Filter by category">
-          <Link href="/" className="chip" aria-current={active.c === null}>
-            All
-          </Link>
-          {present.map((cat) => (
-            <Link
-              key={cat.value}
-              href={`/?c=${cat.value}`}
-              className="chip"
-              aria-current={active.c === cat.value}
-            >
-              {cat.label}
-            </Link>
-          ))}
-        </nav>
-      )}
+      <CategoryTiles
+        units={catalog.available}
+        categories={present}
+        active={active.c}
+      />
 
       <div className="wrap catalog">
         {present.length > 0 && (
@@ -72,8 +62,8 @@ export default async function CatalogPage({
         <div className="catalog-main">
           <div className="count-row">
             <strong>
-              {available.length}{' '}
-              {available.length === 1 ? 'unit in stock' : 'units in stock'}
+              {active.c ? categoryLabel(active.c) : 'In stock now'}
+              <span className="count-pill">{available.length}</span>
             </strong>
             {available.length > 0 && (
               <span>Every unit is one piece. Once it goes, it is gone.</span>
@@ -161,19 +151,4 @@ function matches(unit: Unit, active: Active): boolean {
     if (band && (unit.salePrice < band.min || unit.salePrice > band.max)) return false;
   }
   return true;
-}
-
-function Hero() {
-  return (
-    <section className="hero">
-      <div className="wrap hero-inner">
-        <h1>Refurbished appliances and furniture, checked and photographed</h1>
-        <p>
-          Every piece here is one physical unit with its own photos, including the dents.
-          Book it, pay the balance when it reaches your door. Delivered across Kochi
-          within 20 km.
-        </p>
-      </div>
-    </section>
-  );
 }
