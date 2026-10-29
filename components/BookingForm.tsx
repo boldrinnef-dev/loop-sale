@@ -204,20 +204,59 @@ export default function BookingForm({
       </div>
 
       {warrantyEligible && (
-        <label className="warranty">
-          <input
-            type="checkbox"
-            checked={warranty}
-            onChange={(e) => setWarranty(e.target.checked)}
-          />
-          <span>
-            <strong>Add 6 month warranty, Rs 499</strong>
+        <div className="warranty-block">
+          <label className="warranty">
+            <input
+              type="checkbox"
+              checked={warranty}
+              onChange={(e) => setWarranty(e.target.checked)}
+            />
             <span>
-              One check in visit and an exchange if the unit fails in the first six
-              months.
+              <strong>Add 6 month warranty, Rs 499</strong>
+              <span>
+                One check in visit and an exchange if the unit fails in the first six
+                months.
+              </span>
             </span>
-          </span>
-        </label>
+          </label>
+
+          {/* Inline rather than a popup. A dialog at checkout interrupts the
+              one moment you do not want to interrupt, and on a phone it gets
+              dismissed without being read. */}
+          <details className="warranty-terms">
+            <summary>
+              What it covers
+              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M3 6l5 5 5-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </summary>
+            <div className="warranty-terms-body">
+              <p>
+                <strong>Covered.</strong> Anything that stops the unit working in
+                normal use: compressor, motor, control board, wiring, cooling. One
+                visit from our service team is included. If we cannot repair it, we
+                exchange it for an equivalent unit at no extra cost.
+              </p>
+              <p>
+                <strong>Not covered.</strong> Damage after delivery, from dropping,
+                flooding or a power surge. The cosmetic marks already shown in the
+                photographs, which are what the price reflects. Consumables like
+                pipes and filters.
+              </p>
+              <p>
+                <strong>To claim</strong>, message us on WhatsApp with the unit code
+                on your bill. Valid for six months from the delivery date.
+              </p>
+            </div>
+          </details>
+        </div>
       )}
 
       <div className="field">
