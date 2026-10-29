@@ -149,44 +149,49 @@ a:hover {
   color: #cbdce8;
   max-width: 46ch;
 }
-.banner-points {
+.highlights {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 13px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 @media (min-width: 560px) {
-  .banner-points {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 15px 22px;
+  .highlights {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
   }
 }
-.banner-points li {
-  display: flex;
-  gap: 9px;
-  align-items: flex-start;
+@media (min-width: 880px) {
+  .highlights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
 }
-.banner-points svg {
-  flex: none;
-  margin-top: 2px;
-  color: #7fd1a6;
-}
-.banner-points li > span {
+.highlights li {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  gap: 3px;
+  padding: 13px 12px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.11);
 }
-.banner-points strong {
+.highlights svg {
+  color: #7fd1a6;
+  margin-bottom: 3px;
+}
+.highlights strong {
   font-size: 13.5px;
   font-weight: 600;
   color: #fff;
+  line-height: 1.25;
 }
-.banner-points span span {
-  font-size: 12.5px;
-  line-height: 1.45;
+.highlights li > span {
+  font-size: 12px;
   color: #a8c2d4;
+  line-height: 1.35;
 }
 
 /* Category tiles */
@@ -1299,4 +1304,57 @@ a:hover {
 }
 .gallery-arrow.next {
   right: 10px;
+}
+
+/* FAQ */
+.faq {
+  background: var(--card);
+  border-top: 1px solid var(--line);
+}
+.faq-inner {
+  padding: 34px 20px 40px;
+  max-width: 760px;
+}
+.faq h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.faq-list {
+  border-top: 1px solid var(--line);
+}
+.faq details {
+  border-bottom: 1px solid var(--line);
+}
+.faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  cursor: pointer;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  list-style: none;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary svg {
+  flex: none;
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+.faq details[open] summary svg {
+  transform: rotate(180deg);
+}
+.faq details p {
+  margin: 0;
+  padding: 0 0 15px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 62ch;
 }

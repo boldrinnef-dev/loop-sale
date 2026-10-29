@@ -1,30 +1,17 @@
 /**
  * The banner has one job: tell someone arriving from an Instagram reel what
- * this is and why a stranger's used fridge is safe to buy, in the time it takes
- * to decide whether to scroll.
+ * this is, in the time it takes to decide whether to keep scrolling.
  *
- * So the four points below are the objections, answered in order: how do I know
- * what I am getting, what if it breaks, what does it cost me to get it here,
- * and am I paying everything up front.
+ * The highlights are four words each on purpose. Nobody reads a paragraph on a
+ * banner. The detail behind each one lives in the FAQ at the bottom of the
+ * page, where someone who is actually weighing it up will go looking.
  */
 
-const POINTS = [
-  {
-    title: 'Photographed, not stock images',
-    body: 'Six photos of the exact unit you receive, dents included.'
-  },
-  {
-    title: 'Tested before it is listed',
-    body: 'Run at the godown. Six month warranty available on every unit.'
-  },
-  {
-    title: 'Free delivery within 15 km',
-    body: 'From our Eroor godown. Rs 25 a km after that, up to 40 km.'
-  },
-  {
-    title: 'Pay most of it on delivery',
-    body: 'A small advance books the unit. The balance when it reaches you.'
-  }
+const HIGHLIGHTS = [
+  { icon: 'camera', label: 'Real photos', sub: 'Six per unit' },
+  { icon: 'check', label: 'Tested', sub: '6 month warranty' },
+  { icon: 'truck', label: 'Free delivery', sub: 'Within 15 km' },
+  { icon: 'wallet', label: 'Pay on delivery', sub: 'Small advance books it' }
 ];
 
 export default function Banner() {
@@ -33,36 +20,71 @@ export default function Banner() {
       <div className="wrap banner-inner">
         <div className="banner-copy">
           <span className="banner-eyebrow">Refurbished, Kochi</span>
-          <h1>
-            Appliances and furniture for a fraction of new, with nothing hidden
-          </h1>
+          <h1>Appliances and furniture for a fraction of new</h1>
           <p>
-            Every piece here is one physical unit, checked and photographed before it
-            goes up. When it sells, it is gone.
+            Every piece is one physical unit, checked and photographed before it goes
+            up. When it sells, it is gone.
           </p>
         </div>
 
-        <ul className="banner-points">
-          {POINTS.map((p) => (
-            <li key={p.title}>
-              <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true">
-                <path
-                  d="M3.2 8.4l3.1 3.1 6.5-6.9"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>
-                <strong>{p.title}</strong>
-                <span>{p.body}</span>
-              </span>
+        <ul className="highlights">
+          {HIGHLIGHTS.map((h) => (
+            <li key={h.label}>
+              <Icon name={h.icon} />
+              <strong>{h.label}</strong>
+              <span>{h.sub}</span>
             </li>
           ))}
         </ul>
       </div>
     </section>
+  );
+}
+
+function Icon({ name }: { name: string }) {
+  const common = {
+    width: 20,
+    height: 20,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.6,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true
+  };
+
+  if (name === 'camera') {
+    return (
+      <svg {...common}>
+        <path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.1-2h8.4l1.1 2h2.2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z" />
+        <circle cx="12" cy="13" r="3.4" />
+      </svg>
+    );
+  }
+  if (name === 'check') {
+    return (
+      <svg {...common}>
+        <path d="M12 3l7 3v5.5c0 4.2-2.9 7.6-7 9.5-4.1-1.9-7-5.3-7-9.5V6z" />
+        <path d="M9 12l2 2 4-4.5" />
+      </svg>
+    );
+  }
+  if (name === 'truck') {
+    return (
+      <svg {...common}>
+        <path d="M3 7h10v9H3z" />
+        <path d="M13 10h4l3 3v3h-7z" />
+        <circle cx="7" cy="18" r="1.8" />
+        <circle cx="17" cy="18" r="1.8" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M3 8.5A2.5 2.5 0 0 1 5.5 6H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 16.5z" />
+      <path d="M3 8.5h18" />
+      <circle cx="16.5" cy="13" r="1.1" fill="currentColor" stroke="none" />
+    </svg>
   );
 }

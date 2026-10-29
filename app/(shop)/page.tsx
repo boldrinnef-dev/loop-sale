@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Banner from '@/components/Banner';
 import CategoryTiles from '@/components/CategoryTiles';
+import Faq from '@/components/Faq';
 import Filters, { PRICE_BANDS, type Active } from '@/components/Filters';
 import SetupNotice from '@/components/SetupNotice';
 import UnitCard from '@/components/UnitCard';
@@ -97,6 +98,8 @@ export default async function CatalogPage({
           )}
         </div>
       </div>
+
+      <Faq />
     </main>
   );
 }
