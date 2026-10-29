@@ -11,6 +11,7 @@ import {
 } from '@/lib/delivery';
 
 import { STORAGE_KEY } from '@/lib/delivery-client';
+import { newOrderId, type BookingRecord } from '@/lib/order';
 import { prepayDiscount, type PayChoice } from '@/lib/pricing';
 import {
   dayOptions,
@@ -106,9 +107,50 @@ export default function BookingForm({
     setTouched(true);
     if (!ready) return;
 
+    const orderId = newOrderId();
+    const plan0 = planFor(warranty);
+
+    const record: BookingRecord = {
+      orderId,
+      unitCode: productCode,
+      title,
+      name: name.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
+      pincode,
+      deliveryDate: describeIso(chosen),
+      deliveryFee: deliveryUnknown
+        ? 'to be confirmed'
+        : deliveryFee === 0
+          ? 'free'
+          : rupees(deliveryFee),
+      warranty: plan0 ? `${plan0.name}, 6 months` : '1 month included',
+      payChoice: pay === 'full' ? 'full' : 'advance',
+      dueNow: payNow,
+      total
+    };
+
+    // Fired, not awaited, and deliberately before the WhatsApp window opens.
+    // Awaiting it would put window.open outside the click gesture and every
+    // popup blocker would eat the booking. keepalive lets the request finish
+    // after this tab has gone to WhatsApp.
+    try {
+      void fetch('/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record),
+        keepalive: true
+      }).catch(() => {
+        /* the sale matters more than the row */
+      });
+    } catch {
+      /* ignore */
+    }
+
     const lines = [
       'Hi Nestloop, I want to book this unit from the shop.',
       '',
+      `Booking: ${orderId}`,
       title,
       `Code: ${productCode}`,
       `Unit price: ${rupees(salePrice)}`
@@ -131,8 +173,8 @@ export default function BookingForm({
     lines.push(
       `Total: ${rupees(total)}${deliveryUnknown ? ' plus delivery' : ''}`,
       pay === 'full'
-        ? `Paying in full now: ${rupees(payNow)}`
-        : `Advance now: ${rupees(payNow)}`,
+        ? `Wants to pay in full: ${rupees(payNow)}, send the payment link`
+        : `Advance to collect: ${rupees(payNow)}`,
       balance > 0 || deliveryUnknown
         ? `Balance on delivery: ${rupees(balance)}${deliveryUnknown ? ' plus delivery' : ''}`
         : 'Balance on delivery: nothing',
@@ -358,14 +400,19 @@ export default function BookingForm({
         />
       </div>
 
+      {/* The button said "Pay in full on WhatsApp" while the site took no
+          money at all. Until Razorpay is wired, it books and nothing more, so
+          it says so. */}
       <button type="submit" className="btn btn-block" disabled={touched && !ready}>
-        {pay === 'full' ? 'Pay in full on WhatsApp' : 'Book on WhatsApp'}
+        Book on WhatsApp
       </button>
 
       <p className="fineprint">
-        The advance is adjusted against the price, not charged on top. It is refunded in
-        full if we cannot deliver, or if the unit does not match its photos when it
-        reaches you.
+        {pay === 'full'
+          ? 'We confirm the unit on WhatsApp and send you the payment link there. Nothing is charged on this page.'
+          : 'The advance is adjusted against the price, not charged on top.'}{' '}
+        It is refunded in full if we cannot deliver, or if the unit does not match its
+        photos when it reaches you.
       </p>
     </form>
   );
