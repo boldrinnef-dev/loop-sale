@@ -59,6 +59,7 @@ export default function BookingForm({
   const [pickingOwn, setPickingOwn] = useState(false);
   const [pay, setPay] = useState<PayChoice>('advance');
   const [touched, setTouched] = useState(false);
+  const [sent, setSent] = useState<{ orderId: string; link: string } | null>(null);
 
   useEffect(() => {
     try {
@@ -96,16 +97,37 @@ export default function BookingForm({
   const chosen = day && day >= range.min ? day : days[0].iso;
 
   const servable = q.state === 'quoted' || q.state === 'unknown';
-  const ready =
-    name.trim().length > 1 &&
-    phone.replace(/\D/g, '').length >= 10 &&
-    address.trim().length > 5 &&
-    servable;
+
+  /**
+   * The id of the first field standing in the way, or null when nothing is.
+   *
+   * Ordered the way the form reads, so someone sent to a problem is sent to
+   * the earliest one rather than the last one checked.
+   */
+  function firstProblem(): string | null {
+    if (name.trim().length < 2) return 'bk-name';
+    if (phone.replace(/\D/g, '').length < 10) return 'bk-phone';
+    if (address.trim().length < 6) return 'bk-address';
+    if (!servable) return 'bk-pin';
+    return null;
+  }
+
+  const ready = firstProblem() === null;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
-    if (!ready) return;
+
+    const problem = firstProblem();
+    if (problem) {
+      // The button used to go grey here and the errors sat off the top of the
+      // screen, so pressing Book looked like pressing a dead button. Send the
+      // person to the field instead of leaving them to hunt for it.
+      const el = document.getElementById(problem);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      window.setTimeout(() => (el as HTMLInputElement | null)?.focus({ preventScroll: true }), 260);
+      return;
+    }
 
     const orderId = newOrderId();
     const plan0 = planFor(warranty);
@@ -186,11 +208,15 @@ export default function BookingForm({
       `Preferred delivery: ${describeIso(chosen)}`
     );
 
-    window.open(
-      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(lines.join('\n'))}`,
-      '_blank',
-      'noopener'
-    );
+    const link = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+      lines.join('\n')
+    )}`;
+
+    // A blocked popup used to leave the page looking like nothing happened.
+    // The panel below says the booking is in either way, and carries the link
+    // as a plain tap for the phones that refuse to open windows.
+    setSent({ orderId, link });
+    window.open(link, '_blank', 'noopener');
   }
 
   return (
@@ -403,9 +429,32 @@ export default function BookingForm({
       {/* The button said "Pay in full on WhatsApp" while the site took no
           money at all. Until Razorpay is wired, it books and nothing more, so
           it says so. */}
-      <button type="submit" className="btn btn-block" disabled={touched && !ready}>
+      {/* Never disabled. A grey button that swallows a tap teaches people the
+          site is broken; a live one that walks them to the missing field
+          teaches them what to fix. */}
+      <button type="submit" className="btn btn-block">
         Book on WhatsApp
       </button>
+
+      {touched && !ready && (
+        <p className="form-error">
+          One field above still needs filling. We have jumped you to it.
+        </p>
+      )}
+
+      {sent && (
+        <div className="sent-note">
+          <strong>Booking {sent.orderId} is with us.</strong>
+          <span>
+            WhatsApp should have opened with your details ready to send. If it did
+            not,{' '}
+            <a href={sent.link} target="_blank" rel="noopener noreferrer">
+              tap here to open it
+            </a>
+            .
+          </span>
+        </div>
+      )}
 
       <p className="fineprint">
         {pay === 'full'
