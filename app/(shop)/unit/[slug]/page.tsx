@@ -5,6 +5,7 @@ import DeliveryLine from '@/components/DeliveryLine';
 import AddOns from '@/components/AddOns';
 import Gallery from '@/components/Gallery';
 import { imageUrl, sanityConfigured } from '@/lib/sanity';
+import { INCLUDED_WARRANTY_MONTHS } from '@/lib/warranty';
 import { SAMPLE_UNITS } from '@/lib/sample';
 import {
   categoryLabel,
@@ -137,10 +138,8 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
                   : 'Powered on and shown working before our team leaves.'
               }
             />
-            {unit.warrantyEligible && (
-              <Note text="One month warranty included, at no cost. Extendable to six." />
-            )}
-
+            {/* The warranty is stated in the spec list and again in its own
+                section below. A third mention here was noise. */}
           </div>
 
           {unit.warrantyEligible && <AddOns />}
@@ -185,6 +184,12 @@ function Specs({
     rows.push([
       'Condition grade',
       unit.grade === 'A' ? 'A, cosmetically clean' : 'B, light visible wear'
+    ]);
+  }
+  if (unit.warrantyEligible) {
+    rows.push([
+      'Warranty',
+      `${INCLUDED_WARRANTY_MONTHS} month included, extendable to 6`
     ]);
   }
   rows.push(['Category', categoryLabel(unit.category)]);

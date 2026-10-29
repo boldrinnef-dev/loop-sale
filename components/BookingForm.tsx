@@ -20,6 +20,7 @@ import {
   type DayOption
 } from '@/lib/schedule';
 import {
+  INCLUDED_WARRANTY_MONTHS,
   WARRANTY_PLANS,
   planFor,
   warrantyPrice,
@@ -112,9 +113,12 @@ export default function BookingForm({
       `Code: ${productCode}`,
       `Unit price: ${rupees(salePrice)}`
     ];
+    if (warrantyEligible) {
+      lines.push(`Warranty: ${INCLUDED_WARRANTY_MONTHS} month included`);
+    }
     const plan = planFor(warranty);
     if (plan) {
-      lines.push(`${plan.name} warranty, 6 months: ${rupees(plan.price)}`);
+      lines.push(`Extended to 6 months, ${plan.name}: ${rupees(plan.price)}`);
     }
     lines.push(
       deliveryUnknown
@@ -260,24 +264,41 @@ export default function BookingForm({
 
       {warrantyEligible && (
         <div className="field">
-          <span className="field-label">Extend the warranty, optional</span>
+          <span className="field-label">Extended warranty, optional</span>
+
+          {/* The included month is a fact about the unit, not a choice. Making
+              it a radio option implied you could end up without it. */}
+          <p className="field-stated">
+            <Tick />
+            <span>
+              {INCLUDED_WARRANTY_MONTHS} month warranty comes with this unit at no
+              cost. Add one of these to take it to six.
+            </span>
+          </p>
+
           <div className="pay-options">
-            <PayOption
-              on={warranty === 'none'}
-              onPick={() => setWarranty('none')}
-              title="Keep the included 1 month"
-              sub="Every unit comes with one month of warranty at no cost."
-            />
             {WARRANTY_PLANS.map((p) => (
               <PayOption
                 key={p.id}
                 on={warranty === p.id}
-                onPick={() => setWarranty(p.id)}
+                onPick={() => setWarranty(warranty === p.id ? 'none' : p.id)}
+                shape="check"
                 title={`${p.name}, ${rupees(p.price)}`}
                 sub={p.covers}
               />
             ))}
           </div>
+
+          {warranty !== 'none' && (
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => setWarranty('none')}
+            >
+              Remove the extension
+            </button>
+          )}
+
           <span className="field-help">
             Counted from the delivery date. No warranty covers damage after
             delivery, or the cosmetic marks already shown in the photographs.
@@ -307,7 +328,10 @@ export default function BookingForm({
       <div className="totals">
         <Row k="Unit price" v={rupees(salePrice)} />
         {warrantyCost > 0 && (
-          <Row k={`${planFor(warranty)?.name} warranty, 6 months`} v={rupees(warrantyCost)} />
+          <Row
+            k={`${planFor(warranty)?.name}, extended to 6 months`}
+            v={rupees(warrantyCost)}
+          />
         )}
         <Row
           k={q.state === 'quoted' && q.fee > 0 ? `Delivery, ${q.km} km` : 'Delivery'}
@@ -377,17 +401,23 @@ function PayOption({
   onPick,
   title,
   sub,
-  tag
+  tag,
+  shape = 'radio'
 }: {
   on: boolean;
   onPick: () => void;
   title: string;
   sub: string;
   tag?: string;
+  /** A check reads as "optional, and you can take it off again". */
+  shape?: 'radio' | 'check';
 }) {
   return (
     <button type="button" className="pay-option" aria-pressed={on} onClick={onPick}>
-      <span className="pay-radio" aria-hidden="true" />
+      <span
+        className={shape === 'check' ? 'pay-radio pay-check' : 'pay-radio'}
+        aria-hidden="true"
+      />
       <span className="pay-text">
         <span className="pay-title">
           {title}

@@ -12,7 +12,7 @@ export default function AddOns() {
     <section className="addons">
       <div className="addons-head">
         <h2>Warranty</h2>
-        <span>Extensions chosen at checkout</span>
+        <span>The extension is the only part you choose</span>
       </div>
 
       <div className="addon included">
@@ -21,8 +21,8 @@ export default function AddOns() {
           <span className="addon-price free">Included</span>
         </div>
         <p>
-          Every unit we sell carries this at no cost. If something goes wrong in
-          the first month, we come and put it right.
+          Every unit we sell carries this at no cost, nothing to add at checkout.
+          If something goes wrong in the first month, we come and put it right.
         </p>
       </div>
 

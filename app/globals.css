@@ -1397,6 +1397,46 @@ a:hover {
   border: 5px solid var(--navy);
   background: var(--card);
 }
+/* A square ticks on and off. Used where the option is an add-on rather than
+   one of a set you must choose between. */
+.pay-check {
+  position: relative;
+  border-radius: 5px;
+}
+.pay-option[aria-pressed='true'] .pay-check {
+  border: 1.5px solid var(--navy);
+  background: var(--navy);
+}
+.pay-option[aria-pressed='true'] .pay-check::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* A fact stated above a set of options, not an option itself. */
+.field-stated {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #eaf4ee;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #15653f;
+  font-weight: 600;
+}
+.field-stated svg {
+  flex: none;
+  margin-top: 2px;
+}
 .pay-text {
   display: flex;
   flex-direction: column;
