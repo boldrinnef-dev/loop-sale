@@ -11,6 +11,7 @@ import {
 } from '@/lib/delivery';
 
 import { STORAGE_KEY } from '@/lib/delivery-client';
+import { prepayDiscount, type PayChoice } from '@/lib/pricing';
 const WARRANTY_PRICE = 499;
 
 type Props = {
@@ -41,6 +42,7 @@ export default function BookingForm({
   const [pincode, setPincode] = useState('');
   const [warranty, setWarranty] = useState(false);
   const [slot, setSlot] = useState(0);
+  const [pay, setPay] = useState<PayChoice>('advance');
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
@@ -58,8 +60,18 @@ export default function BookingForm({
   const deliveryFee = q.state === 'quoted' ? q.fee : 0;
   const deliveryUnknown = q.state === 'unknown';
   const goods = salePrice + (warranty ? WARRANTY_PRICE : 0);
-  const total = goods + deliveryFee;
-  const balance = total - advance;
+  const gross = goods + deliveryFee;
+
+  // Discount applies to the goods, not the delivery fee. Delivery is a cost we
+  // pay out, so discounting it would mean paying the customer to live further
+  // away.
+  const discount = pay === 'full' ? prepayDiscount(goods) : 0;
+  const total = gross - discount;
+
+  // A delivery fee we have not been able to quote cannot be charged up front,
+  // so prepay collects the goods and the fee is settled on delivery.
+  const payNow = pay === 'full' ? (deliveryUnknown ? goods - discount : total) : advance;
+  const balance = total - payNow;
 
   const servable = q.state === 'quoted' || q.state === 'unknown';
   const ready =
@@ -88,10 +100,15 @@ export default function BookingForm({
           ? 'Delivery: free'
           : `Delivery: ${rupees(deliveryFee)}`
     );
+    if (discount > 0) lines.push(`Paid in full discount: -${rupees(discount)}`);
     lines.push(
       `Total: ${rupees(total)}${deliveryUnknown ? ' plus delivery' : ''}`,
-      `Advance: ${rupees(advance)}`,
-      `Balance on delivery: ${rupees(balance)}${deliveryUnknown ? ' plus delivery' : ''}`,
+      pay === 'full'
+        ? `Paying in full now: ${rupees(payNow)}`
+        : `Advance now: ${rupees(payNow)}`,
+      balance > 0 || deliveryUnknown
+        ? `Balance on delivery: ${rupees(balance)}${deliveryUnknown ? ' plus delivery' : ''}`
+        : 'Balance on delivery: nothing',
       '',
       `Name: ${name.trim()}`,
       `Phone: ${phone.trim()}`,
@@ -203,6 +220,25 @@ export default function BookingForm({
         </label>
       )}
 
+      <div className="field">
+        <span className="field-label">How you want to pay</span>
+        <div className="pay-options">
+          <PayOption
+            on={pay === 'advance'}
+            onPick={() => setPay('advance')}
+            title={`${rupees(advance)} now`}
+            sub={`Balance of ${rupees(gross - advance)} when it reaches you, UPI or cash.`}
+          />
+          <PayOption
+            on={pay === 'full'}
+            onPick={() => setPay('full')}
+            title={`${rupees(gross - prepayDiscount(goods))} now`}
+            sub="Pay in full and nothing is owed at the door."
+            tag={`Save ${rupees(prepayDiscount(goods))}`}
+          />
+        </div>
+      </div>
+
       <div className="totals">
         <Row k="Unit price" v={rupees(salePrice)} />
         {warranty && <Row k="Warranty, 6 months" v={rupees(WARRANTY_PRICE)} />}
@@ -216,12 +252,23 @@ export default function BookingForm({
                 : rupees(deliveryFee)
           }
         />
-        <Row k="Advance now" v={rupees(advance)} />
-        <Row k="Balance on delivery" v={rupees(balance)} strong />
+        {discount > 0 && <Row k="Paid in full discount" v={`-${rupees(discount)}`} good />}
+        <Row k={pay === 'full' ? 'Paying now' : 'Advance now'} v={rupees(payNow)} />
+        <Row
+          k="Balance on delivery"
+          v={
+            deliveryUnknown
+              ? `${rupees(balance)} plus delivery`
+              : balance > 0
+                ? rupees(balance)
+                : 'Nothing'
+          }
+          strong
+        />
       </div>
 
       <button type="submit" className="btn btn-block" disabled={touched && !ready}>
-        Book on WhatsApp
+        {pay === 'full' ? 'Pay in full on WhatsApp' : 'Book on WhatsApp'}
       </button>
 
       <p className="fineprint">
@@ -239,12 +286,49 @@ function tone(state: string, fee: number): string {
   return '';
 }
 
-function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
+function Row({
+  k,
+  v,
+  strong,
+  good
+}: {
+  k: string;
+  v: string;
+  strong?: boolean;
+  good?: boolean;
+}) {
   return (
-    <div className={strong ? 'total-row strong' : 'total-row'}>
+    <div className={`total-row${strong ? ' strong' : ''}${good ? ' good' : ''}`}>
       <span>{k}</span>
       <span>{v}</span>
     </div>
+  );
+}
+
+function PayOption({
+  on,
+  onPick,
+  title,
+  sub,
+  tag
+}: {
+  on: boolean;
+  onPick: () => void;
+  title: string;
+  sub: string;
+  tag?: string;
+}) {
+  return (
+    <button type="button" className="pay-option" aria-pressed={on} onClick={onPick}>
+      <span className="pay-radio" aria-hidden="true" />
+      <span className="pay-text">
+        <span className="pay-title">
+          {title}
+          {tag && <span className="pay-tag">{tag}</span>}
+        </span>
+        <span className="pay-sub">{sub}</span>
+      </span>
+    </button>
   );
 }
 
