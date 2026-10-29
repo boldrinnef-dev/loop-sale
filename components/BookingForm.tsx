@@ -13,6 +13,13 @@ import {
 import { STORAGE_KEY } from '@/lib/delivery-client';
 import { prepayDiscount, type PayChoice } from '@/lib/pricing';
 import {
+  dayOptions,
+  describeIso,
+  leadDays,
+  pickerRange,
+  type DayOption
+} from '@/lib/schedule';
+import {
   WARRANTY_PLANS,
   planFor,
   warrantyPrice,
@@ -46,7 +53,8 @@ export default function BookingForm({
   const [address, setAddress] = useState('');
   const [pincode, setPincode] = useState('');
   const [warranty, setWarranty] = useState<WarrantyChoice>('none');
-  const [slot, setSlot] = useState(0);
+  const [day, setDay] = useState<string | null>(null);
+  const [pickingOwn, setPickingOwn] = useState(false);
   const [pay, setPay] = useState<PayChoice>('advance');
   const [touched, setTouched] = useState(false);
 
@@ -60,7 +68,7 @@ export default function BookingForm({
   }, []);
 
   const q = quote(pincode);
-  const slots = nextTwoDays();
+  const days = dayOptions(q);
 
   const deliveryFee = q.state === 'quoted' ? q.fee : 0;
   const deliveryUnknown = q.state === 'unknown';
@@ -78,6 +86,12 @@ export default function BookingForm({
   // so prepay collects the goods and the fee is settled on delivery.
   const payNow = pay === 'full' ? (deliveryUnknown ? goods - discount : total) : advance;
   const balance = total - payNow;
+
+  const range = pickerRange(q);
+  // The pincode can change after a date was picked, which moves the earliest
+  // date. Fall back to the soonest rather than silently keeping an impossible
+  // one.
+  const chosen = day && day >= range.min ? day : days[0].iso;
 
   const servable = q.state === 'quoted' || q.state === 'unknown';
   const ready =
@@ -123,7 +137,7 @@ export default function BookingForm({
       `Phone: ${phone.trim()}`,
       `Address: ${address.trim()}`,
       `Pincode: ${pincode}`,
-      `Preferred delivery: ${slots[slot].long}`
+      `Preferred delivery: ${describeIso(chosen)}`
     );
 
     window.open(
@@ -196,20 +210,52 @@ export default function BookingForm({
 
       <div className="field">
         <span className="field-label">Preferred delivery day</span>
+
         <div className="slots">
-          {slots.map((s, i) => (
+          {days.map((d: DayOption) => (
             <button
-              key={s.long}
+              key={d.iso}
               type="button"
               className="slot"
-              aria-pressed={slot === i}
-              onClick={() => setSlot(i)}
+              aria-pressed={chosen === d.iso}
+              onClick={() => {
+                setDay(d.iso);
+                setPickingOwn(false);
+              }}
             >
-              <span className="slot-day">{s.day}</span>
-              <span className="slot-date">{s.date}</span>
+              <span className="slot-day">{d.day}</span>
+              <span className="slot-date">{d.date}</span>
+              {d.soonest && <span className="slot-tag">Soonest</span>}
             </button>
           ))}
         </div>
+
+        {pickingOwn ? (
+          <input
+            type="date"
+            className="date-input"
+            value={chosen}
+            min={range.min}
+            max={range.max}
+            onChange={(e) => e.target.value && setDay(e.target.value)}
+          />
+        ) : (
+          <button
+            type="button"
+            className="link-button"
+            onClick={() => setPickingOwn(true)}
+          >
+            Pick a different date
+          </button>
+        )}
+
+        <span className="field-help">
+          {leadDays(q) === 2
+            ? 'We can usually be there in 48 hours.'
+            : 'Outside Kochi city it takes a day longer, so three days from booking.'}{' '}
+          The exact time slot is confirmed on WhatsApp after you book, once we see
+          that day{String.fromCharCode(39)}s load.
+        </span>
       </div>
 
       {warrantyEligible && (
@@ -410,19 +456,4 @@ function Tick() {
       />
     </svg>
   );
-}
-
-/** Tomorrow and the day after, the realistic delivery window. */
-function nextTwoDays() {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ];
-  return [1, 2].map((offset) => {
-    const d = new Date();
-    d.setDate(d.getDate() + offset);
-    const date = `${d.getDate()} ${months[d.getMonth()]}`;
-    return { day: days[d.getDay()], date, long: `${days[d.getDay()]} ${date}` };
-  });
 }

@@ -1564,3 +1564,54 @@ a:hover {
 .addon-price.free {
   color: var(--green);
 }
+
+/* Delivery day picker */
+.slots {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.slots::-webkit-scrollbar {
+  display: none;
+}
+.slot {
+  flex: none;
+  min-width: 74px;
+  position: relative;
+  padding: 9px 10px 8px;
+}
+.slot-tag {
+  display: block;
+  margin-top: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.date-input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  background: var(--card);
+  color: var(--ink);
+}
+.link-button {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 2px 0;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
