@@ -1,12 +1,21 @@
 /**
- * Extended Limited Warranty, six months, as priced in the Nestloop warranty
- * document. Two tiers, and the difference between them is parts.
+ * Warranty has two layers.
  *
- * This is a repair plan, not an exchange plan. Worth being precise about on
- * the site, because "we will replace it" and "we will fix it and you pay for
- * the compressor" are very different promises and the gap between them is
- * where a dispute lives.
+ * Every unit carries one month, included, at no cost. That is the stronger
+ * selling line of the two and belongs wherever someone is deciding, not
+ * buried in terms.
+ *
+ * On top of that sits the Extended Limited Warranty, six months, in two paid
+ * tiers. The difference between them is parts.
+ *
+ * The extension is a repair plan, not an exchange plan. Worth being precise
+ * about, because "we will replace it" and "we will fix it and you pay for the
+ * compressor" are very different promises, and the gap between them is where
+ * a dispute lives.
  */
+
+/** Free, on every refurbished unit. */
+export const INCLUDED_WARRANTY_MONTHS = 1;
 
 export type WarrantyPlan = {
   id: 'silver' | 'gold';

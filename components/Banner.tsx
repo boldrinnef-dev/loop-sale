@@ -13,7 +13,7 @@
 
 const HIGHLIGHTS = [
   { icon: 'camera', label: 'Real photos', sub: 'Six per unit' },
-  { icon: 'check', label: 'Tested', sub: 'Warranty from Rs 499' },
+  { icon: 'check', label: 'Tested', sub: '1 month warranty free' },
   { icon: 'truck', label: 'Free delivery', sub: 'Within 15 km' },
   { icon: 'wallet', label: 'Pay on delivery', sub: 'Small advance books it' }
 ];

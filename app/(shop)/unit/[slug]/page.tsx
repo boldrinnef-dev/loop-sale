@@ -137,6 +137,9 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
                   : 'Powered on and shown working before our team leaves.'
               }
             />
+            {unit.warrantyEligible && (
+              <Note text="One month warranty included, at no cost. Extendable to six." />
+            )}
 
           </div>
 

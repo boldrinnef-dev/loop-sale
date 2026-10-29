@@ -23,7 +23,7 @@ const FAQS = [
   },
   {
     q: 'What if it stops working?',
-    a: 'Every refurbished appliance is run and tested at the godown before listing. You can also add a six month warranty at checkout. Silver, Rs 499, means our technician works on the unit free and you pay only for any replacement part. Gold, Rs 899, covers labour and parts both, so a fault costs you nothing. Neither covers damage after delivery or the cosmetic marks already in the photographs.'
+    a: 'Every unit comes with one month of warranty at no cost, so if something goes wrong in the first month we come and put it right. You can extend that to six months at checkout. Silver, Rs 499, means our technician works on the unit free and you pay only for any replacement part. Gold, Rs 899, covers labour and parts both, so a fault costs you nothing. No warranty covers damage after delivery or the cosmetic marks already shown in the photographs.'
   },
   {
     q: 'How much is delivery?',

@@ -214,13 +214,13 @@ export default function BookingForm({
 
       {warrantyEligible && (
         <div className="field">
-          <span className="field-label">Six month warranty, optional</span>
+          <span className="field-label">Extend the warranty, optional</span>
           <div className="pay-options">
             <PayOption
               on={warranty === 'none'}
               onPick={() => setWarranty('none')}
-              title="No warranty"
-              sub="The unit is tested before it leaves us either way."
+              title="Keep the included 1 month"
+              sub="Every unit comes with one month of warranty at no cost."
             />
             {WARRANTY_PLANS.map((p) => (
               <PayOption
@@ -233,7 +233,7 @@ export default function BookingForm({
             ))}
           </div>
           <span className="field-help">
-            Six months from the delivery date. Neither plan covers damage after
+            Counted from the delivery date. No warranty covers damage after
             delivery, or the cosmetic marks already shown in the photographs.
           </span>
         </div>

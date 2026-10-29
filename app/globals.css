@@ -1556,3 +1556,11 @@ a:hover {
   line-height: 1.5;
   color: var(--muted);
 }
+
+.addon.included {
+  border-bottom: 1px solid var(--line);
+  background: #f6faf7;
+}
+.addon-price.free {
+  color: var(--green);
+}
