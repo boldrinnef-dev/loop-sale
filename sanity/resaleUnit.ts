@@ -271,7 +271,7 @@ export const resaleUnit = defineType({
       type: 'array',
       group: 'photos',
       description:
-        'The intake shots for this code: front, controls, interior, rear, model plate. First image is the catalog thumbnail.',
+        'Six shots is the standard set for this code: front, controls, interior, rear, model plate, and one more angle. First image is the catalog thumbnail.',
       of: [
         {
           type: 'image',
@@ -300,7 +300,31 @@ export const resaleUnit = defineType({
           ],
         },
       ],
-      validation: (Rule) => Rule.required().min(3).max(10),
+      validation: (Rule) => [
+        Rule.required().min(3).max(10),
+        Rule.max(6).warning(
+          'Six is the standard set. More than that and nobody scrolls to the end.'
+        ),
+      ],
+    }),
+    defineField({
+      name: 'video',
+      title: 'Video, one clip',
+      type: 'file',
+      group: 'photos',
+      options: { accept: 'video/*' },
+      description:
+        'Fifteen seconds, shot vertical, showing the unit actually running: the drum turning, the compressor on, the door sealing. A photograph cannot prove a machine works and this can, which is why it sells. Keep it under 20 MB, and do not narrate it.',
+      fields: [
+        {
+          name: 'caption',
+          title: 'What the clip shows',
+          type: 'string',
+          description:
+            'One short line, shown under the player. Example: "Full spin cycle, no wobble."',
+          validation: (Rule: any) => Rule.max(70),
+        },
+      ],
     }),
     defineField({
       name: 'defectImage',

@@ -13,6 +13,8 @@ const base = {
   advanceAmount: 500,
   soldAt: null,
   images: null,
+  video: null,
+  videoCaption: null,
   defectImage: null
 };
 

@@ -84,3 +84,21 @@ export function imageUrl(
 
   return `https://cdn.sanity.io/images/${projectId}/${dataset}/${assetId}-${dimensions}.${ext}?${query.toString()}`;
 }
+
+/**
+ * Same idea for an uploaded file, whose _ref looks like
+ * file-abc123...-mp4
+ *
+ * Files carry no dimensions in the ref and get no transforms: the browser
+ * receives the mp4 as it was uploaded. That is why the Studio asks for a short
+ * clip under 20 MB, and why the player on the page never preloads it.
+ */
+export function fileUrl(ref: string | null | undefined): string | null {
+  if (!ref || !projectId) return null;
+
+  const parts = ref.split('-');
+  if (parts.length < 3 || parts[0] !== 'file') return null;
+
+  const [, assetId, ext] = parts;
+  return `https://cdn.sanity.io/files/${projectId}/${dataset}/${assetId}.${ext}`;
+}

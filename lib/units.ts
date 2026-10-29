@@ -30,6 +30,9 @@ export type Unit = {
   status: UnitStatus;
   soldAt: string | null;
   images: SanityImage[] | null;
+  /** Asset ref of the one clip, or null. */
+  video: string | null;
+  videoCaption: string | null;
   defectImage: string | null;
 };
 
@@ -53,6 +56,8 @@ const FIELDS = `
   status,
   soldAt,
   "images": images[]{ "ref": asset._ref, alt, shotType },
+  "video": video.asset._ref,
+  "videoCaption": video.caption,
   "defectImage": defectImage.asset._ref
 `;
 

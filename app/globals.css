@@ -533,6 +533,42 @@ a:hover {
   object-fit: cover;
   display: block;
 }
+/* The clip rides in the same strip as the photos, marked by a play badge so it
+   is obvious one of these is not a picture. */
+.thumb-clip {
+  position: relative;
+}
+.thumb-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgba(16, 20, 24, 0.34);
+}
+.thumb-play svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+.gallery-main video {
+  max-width: 100%;
+  max-height: 62vh;
+  width: auto;
+  height: auto;
+  display: block;
+  background: #000;
+}
+@media (min-width: 860px) {
+  .gallery-main video {
+    max-height: 560px;
+  }
+}
+.clip-note {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
 
 .unit-head {
   display: flex;

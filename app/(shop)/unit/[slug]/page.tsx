@@ -77,6 +77,8 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
       <div className="unit-layout">
         <Gallery
           images={unit.images ?? []}
+          video={unit.video}
+          videoCaption={unit.videoCaption}
           title={unit.title}
           sold={available ? null : unit.status === 'sold' ? 'SOLD' : 'RESERVED'}
         />
