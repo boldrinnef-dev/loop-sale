@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import DeliveryLine from '@/components/DeliveryLine';
+import AddOns from '@/components/AddOns';
 import Gallery from '@/components/Gallery';
 import { imageUrl, sanityConfigured } from '@/lib/sanity';
 import { SAMPLE_UNITS } from '@/lib/sample';
@@ -136,10 +137,10 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
                   : 'Powered on and shown working before our team leaves.'
               }
             />
-            {unit.warrantyEligible && (
-              <Note text="Six month check in warranty available for Rs 499, with exchange if it fails." />
-            )}
+
           </div>
+
+          {unit.warrantyEligible && <AddOns />}
         </div>
       </div>
 

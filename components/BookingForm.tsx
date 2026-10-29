@@ -12,7 +12,12 @@ import {
 
 import { STORAGE_KEY } from '@/lib/delivery-client';
 import { prepayDiscount, type PayChoice } from '@/lib/pricing';
-const WARRANTY_PRICE = 499;
+import {
+  WARRANTY_PLANS,
+  planFor,
+  warrantyPrice,
+  type WarrantyChoice
+} from '@/lib/warranty';
 
 type Props = {
   productCode: string;
@@ -40,7 +45,7 @@ export default function BookingForm({
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [pincode, setPincode] = useState('');
-  const [warranty, setWarranty] = useState(false);
+  const [warranty, setWarranty] = useState<WarrantyChoice>('none');
   const [slot, setSlot] = useState(0);
   const [pay, setPay] = useState<PayChoice>('advance');
   const [touched, setTouched] = useState(false);
@@ -59,7 +64,8 @@ export default function BookingForm({
 
   const deliveryFee = q.state === 'quoted' ? q.fee : 0;
   const deliveryUnknown = q.state === 'unknown';
-  const goods = salePrice + (warranty ? WARRANTY_PRICE : 0);
+  const warrantyCost = warrantyPrice(warranty);
+  const goods = salePrice + warrantyCost;
   const gross = goods + deliveryFee;
 
   // Discount applies to the goods, not the delivery fee. Delivery is a cost we
@@ -92,7 +98,10 @@ export default function BookingForm({
       `Code: ${productCode}`,
       `Unit price: ${rupees(salePrice)}`
     ];
-    if (warranty) lines.push(`Warranty, 6 months: ${rupees(WARRANTY_PRICE)}`);
+    const plan = planFor(warranty);
+    if (plan) {
+      lines.push(`${plan.name} warranty, 6 months: ${rupees(plan.price)}`);
+    }
     lines.push(
       deliveryUnknown
         ? 'Delivery: to be confirmed'
@@ -204,58 +213,29 @@ export default function BookingForm({
       </div>
 
       {warrantyEligible && (
-        <div className="warranty-block">
-          <label className="warranty">
-            <input
-              type="checkbox"
-              checked={warranty}
-              onChange={(e) => setWarranty(e.target.checked)}
+        <div className="field">
+          <span className="field-label">Six month warranty, optional</span>
+          <div className="pay-options">
+            <PayOption
+              on={warranty === 'none'}
+              onPick={() => setWarranty('none')}
+              title="No warranty"
+              sub="The unit is tested before it leaves us either way."
             />
-            <span>
-              <strong>Add 6 month warranty, Rs 499</strong>
-              <span>
-                One check in visit and an exchange if the unit fails in the first six
-                months.
-              </span>
-            </span>
-          </label>
-
-          {/* Inline rather than a popup. A dialog at checkout interrupts the
-              one moment you do not want to interrupt, and on a phone it gets
-              dismissed without being read. */}
-          <details className="warranty-terms">
-            <summary>
-              What it covers
-              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
-                <path
-                  d="M3 6l5 5 5-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </summary>
-            <div className="warranty-terms-body">
-              <p>
-                <strong>Covered.</strong> Anything that stops the unit working in
-                normal use: compressor, motor, control board, wiring, cooling. One
-                visit from our service team is included. If we cannot repair it, we
-                exchange it for an equivalent unit at no extra cost.
-              </p>
-              <p>
-                <strong>Not covered.</strong> Damage after delivery, from dropping,
-                flooding or a power surge. The cosmetic marks already shown in the
-                photographs, which are what the price reflects. Consumables like
-                pipes and filters.
-              </p>
-              <p>
-                <strong>To claim</strong>, message us on WhatsApp with the unit code
-                on your bill. Valid for six months from the delivery date.
-              </p>
-            </div>
-          </details>
+            {WARRANTY_PLANS.map((p) => (
+              <PayOption
+                key={p.id}
+                on={warranty === p.id}
+                onPick={() => setWarranty(p.id)}
+                title={`${p.name}, ${rupees(p.price)}`}
+                sub={p.covers}
+              />
+            ))}
+          </div>
+          <span className="field-help">
+            Six months from the delivery date. Neither plan covers damage after
+            delivery, or the cosmetic marks already shown in the photographs.
+          </span>
         </div>
       )}
 
@@ -280,7 +260,9 @@ export default function BookingForm({
 
       <div className="totals">
         <Row k="Unit price" v={rupees(salePrice)} />
-        {warranty && <Row k="Warranty, 6 months" v={rupees(WARRANTY_PRICE)} />}
+        {warrantyCost > 0 && (
+          <Row k={`${planFor(warranty)?.name} warranty, 6 months`} v={rupees(warrantyCost)} />
+        )}
         <Row
           k={q.state === 'quoted' && q.fee > 0 ? `Delivery, ${q.km} km` : 'Delivery'}
           v={
