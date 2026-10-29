@@ -105,7 +105,7 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
             <DeliveryLine salePrice={unit.salePrice} />
           </div>
 
-          {unit.conditionNote && (
+          {unit.condition !== 'new' && unit.conditionNote && (
             <section className="panel">
               <div className="panel-head">Condition of this exact unit</div>
               <div className="panel-body">
@@ -129,7 +129,13 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
                 balance
               )} on delivery, UPI or cash.`}
             />
-            <Note text="Powered on and shown working before our team leaves." />
+            <Note
+              text={
+                unit.condition === 'new'
+                  ? 'Unpacked and set up at your place before our team leaves.'
+                  : 'Powered on and shown working before our team leaves.'
+              }
+            />
             {unit.warrantyEligible && (
               <Note text="Six month check in warranty available for Rs 499, with exchange if it fails." />
             )}
@@ -169,7 +175,9 @@ function Specs({
   if (unit.approxAgeYears !== null && unit.approxAgeYears !== undefined) {
     rows.push(['Approximate age', `${unit.approxAgeYears} years`]);
   }
-  if (unit.grade) {
+  if (unit.condition === 'new') {
+    rows.push(['Condition', 'Brand new, unused']);
+  } else if (unit.grade) {
     rows.push([
       'Condition grade',
       unit.grade === 'A' ? 'A, cosmetically clean' : 'B, light visible wear'

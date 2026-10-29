@@ -5,6 +5,10 @@
  * The highlights are four words each on purpose. Nobody reads a paragraph on a
  * banner. The detail behind each one lives in the FAQ at the bottom of the
  * page, where someone who is actually weighing it up will go looking.
+ *
+ * The headline says "home essentials" rather than "refurbished appliances" so
+ * that new furniture can join without a rewrite. The sub-line carries the
+ * appliance detail, because appliances are what we are pushing now.
  */
 
 const HIGHLIGHTS = [
@@ -19,11 +23,12 @@ export default function Banner() {
     <section className="banner">
       <div className="wrap banner-inner">
         <div className="banner-copy">
-          <span className="banner-eyebrow">Refurbished, Kochi</span>
-          <h1>Appliances and furniture for a fraction of new</h1>
+          <span className="banner-eyebrow">Kochi</span>
+          <h1>Home essentials for a fraction of retail</h1>
           <p>
-            Every piece is one physical unit, checked and photographed before it goes
-            up. When it sells, it is gone.
+            Refurbished fridges and washing machines, each one tested and photographed
+            before it goes up. Every listing is a single unit. When it sells, it is
+            gone.
           </p>
         </div>
 

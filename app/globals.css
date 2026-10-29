@@ -1428,3 +1428,10 @@ a:hover {
 .total-row.good span:last-child {
   color: var(--green);
 }
+
+.badge.fresh {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+  font-weight: 700;
+}

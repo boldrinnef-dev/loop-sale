@@ -8,8 +8,11 @@ export type SanityImage = {
   shotType: string | null;
 };
 
+export type Condition = 'refurbished' | 'new';
+
 export type Unit = {
   slug: string;
+  condition: Condition;
   productCode: string;
   title: string;
   category: string | null;
@@ -32,6 +35,7 @@ export type Unit = {
 
 const FIELDS = `
   "slug": slug.current,
+  "condition": coalesce(condition, "refurbished"),
   productCode,
   title,
   category,

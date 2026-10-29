@@ -6,6 +6,7 @@ import type { Unit } from './units';
  * Sanity project is connected this is never read again.
  */
 const base = {
+  condition: 'refurbished' as const,
   category: null,
   model: null,
   warrantyEligible: true,

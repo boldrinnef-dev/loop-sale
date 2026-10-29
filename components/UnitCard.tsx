@@ -18,6 +18,8 @@ export default function UnitCard({ unit }: { unit: Unit }) {
 
         {gone ? (
           <span className="badge sold">{unit.status === 'sold' ? 'SOLD' : 'RESERVED'}</span>
+        ) : unit.condition === 'new' ? (
+          <span className="badge fresh">Brand new</span>
         ) : (
           unit.grade && <span className="badge">Grade {unit.grade}</span>
         )}

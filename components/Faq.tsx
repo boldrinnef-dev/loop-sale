@@ -11,15 +11,19 @@
 const FAQS = [
   {
     q: 'Are the photos of the actual unit I get?',
-    a: 'Yes. Every listing is one physical appliance with its own photographs, taken at our godown before it goes up. No stock images, no photos of a similar model. If a unit has a dent, there is a close-up of the dent.'
+    a: 'Yes. Every listing is one physical item with its own photographs, taken at our godown before it goes up. No stock images, no photos of a similar model. If a unit has a dent, there is a close-up of the dent.'
+  },
+  {
+    q: 'Is everything second hand?',
+    a: 'The appliances are. Fridges and washing machines come to us used, and we test, clean and grade each one. Furniture is brand new, bought direct from wholesale vendors and manufacturers rather than through a showroom, which is why it costs less than a shop charges. Anything new is labelled Brand new on the listing.'
   },
   {
     q: 'What do Grade A and Grade B mean?',
-    a: 'Grade A is cosmetically clean with no visible damage. Grade B works properly but has marks, scuffs or a dent somewhere. We will not list a Grade B unit without a close-up photo of what is wrong with it.'
+    a: 'Grading applies to refurbished appliances only. Grade A is cosmetically clean with no visible damage. Grade B works properly but has marks, scuffs or a dent somewhere. We will not list a Grade B unit without a close-up photo of what is wrong with it. New items carry no grade because there is nothing to disclose.'
   },
   {
     q: 'What if it stops working?',
-    a: 'Every unit is run and tested at the godown before listing. You can add a six month warranty for Rs 499, which covers a check-in visit and an exchange if the unit fails in that time.'
+    a: 'Every refurbished appliance is run and tested at the godown before listing. You can add a six month warranty for Rs 499, which covers a check-in visit and an exchange if the unit fails in that time.'
   },
   {
     q: 'How much is delivery?',

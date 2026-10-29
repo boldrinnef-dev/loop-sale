@@ -81,6 +81,23 @@ export const resaleUnit = defineType({
 
     // ---------- Listing ----------
     defineField({
+      name: 'condition',
+      title: 'Refurbished or new',
+      type: 'string',
+      group: 'listing',
+      description:
+        'Appliances are refurbished, so they carry a grade and an honest condition note. Furniture is bought new from wholesale vendors and manufacturers, so it carries neither.',
+      options: {
+        list: [
+          { title: 'Refurbished', value: 'refurbished' },
+          { title: 'Brand new', value: 'new' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'refurbished',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'title',
       title: 'Display title',
       type: 'string',
@@ -157,7 +174,13 @@ export const resaleUnit = defineType({
         ],
         layout: 'radio',
       },
-      validation: (Rule) => Rule.required(),
+      hidden: ({ document }) => document?.condition === 'new',
+      validation: (Rule) =>
+        Rule.custom((grade, context) => {
+          const doc = context.document as any
+          if (doc?.condition === 'new') return true
+          return grade ? true : 'A refurbished unit needs a grade'
+        }),
     }),
     defineField({
       name: 'conditionNote',
@@ -167,7 +190,16 @@ export const resaleUnit = defineType({
       group: 'listing',
       description:
         'One or two honest sentences. Say what the marks are and where. This is what prevents an argument at the door.',
-      validation: (Rule) => Rule.required().min(20).max(400),
+      hidden: ({ document }) => document?.condition === 'new',
+      validation: (Rule) =>
+        Rule.max(400).custom((note, context) => {
+          const doc = context.document as any
+          if (doc?.condition === 'new') return true
+          if (!note || String(note).trim().length < 20) {
+            return 'A refurbished unit needs an honest condition note, at least 20 characters'
+          }
+          return true
+        }),
     }),
     defineField({
       name: 'included',
@@ -278,10 +310,12 @@ export const resaleUnit = defineType({
       options: { hotspot: true },
       description:
         'Mandatory on Grade B. Shown on the product page, never hidden. An undisclosed dent comes back as a warranty claim.',
+      hidden: ({ document }) => document?.condition === 'new',
       validation: (Rule) =>
         Rule.custom((image, context) => {
-          const grade = (context.document as any)?.grade
-          if (grade === 'B' && !image) return 'A Grade B unit needs a defect photo'
+          const doc = context.document as any
+          if (doc?.condition === 'new') return true
+          if (doc?.grade === 'B' && !image) return 'A Grade B unit needs a defect photo'
           return true
         }),
     }),
@@ -354,11 +388,12 @@ export const resaleUnit = defineType({
     select: {
       title: 'title',
       code: 'productCode',
+      condition: 'condition',
       price: 'salePrice',
       status: 'status',
       media: 'images.0',
     },
-    prepare({ title, code, price, status, media }) {
+    prepare({ title, code, condition, price, status, media }) {
       const badge: Record<string, string> = {
         draft: 'DRAFT',
         available: 'AVAILABLE',
@@ -368,7 +403,7 @@ export const resaleUnit = defineType({
       }
       return {
         title: title || code,
-        subtitle: `${code} | Rs ${price ?? '?'} | ${badge[status] ?? status ?? 'no status'}`,
+        subtitle: `${code} | ${condition === 'new' ? 'NEW' : 'REFURB'} | Rs ${price ?? '?'} | ${badge[status] ?? status ?? 'no status'}`,
         media,
       }
     },
