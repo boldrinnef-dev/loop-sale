@@ -771,6 +771,26 @@ a:hover {
   padding: 14px;
   z-index: 30;
 }
+.panel-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.panel-close:hover {
+  background: var(--fill);
+  color: var(--ink);
+}
 .delivery-form {
   display: flex;
   flex-direction: column;

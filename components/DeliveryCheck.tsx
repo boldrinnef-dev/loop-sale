@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   FREE_RADIUS_KM,
   MAX_RADIUS_KM,
@@ -18,6 +18,32 @@ export default function DeliveryCheckControl() {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
   const [result, setResult] = useState<DeliveryQuote>({ state: 'empty' });
+  const box = useRef<HTMLDivElement>(null);
+
+  /**
+   * The panel used to close only by hitting the pill again, which is not where
+   * anyone's hand goes. Three ways out now: tap anywhere else, press Escape,
+   * or use the close button.
+   */
+  useEffect(() => {
+    if (!open) return;
+
+    function onPointer(e: MouseEvent | TouchEvent) {
+      if (!box.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+
+    document.addEventListener('mousedown', onPointer);
+    document.addEventListener('touchstart', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointer);
+      document.removeEventListener('touchstart', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
 
   useEffect(() => {
     try {
@@ -43,12 +69,16 @@ export default function DeliveryCheckControl() {
       }
       announcePincode();
     }
+    // A pincode we can price is answered by the pill itself, so there is
+    // nothing left to read. Anything else keeps the panel open, because the
+    // message is the answer.
+    if (next.state === 'quoted') setOpen(false);
   }
 
   const settled = result.state === 'quoted';
 
   return (
-    <div className="delivery">
+    <div className="delivery" ref={box}>
       <button
         type="button"
         className="pill pill-button"
@@ -70,6 +100,23 @@ export default function DeliveryCheckControl() {
 
       {open && (
         <div className="delivery-panel">
+          <button
+            type="button"
+            className="panel-close"
+            onClick={() => setOpen(false)}
+            aria-label="Close"
+          >
+            <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true">
+              <path
+                d="M2 2l10 10M12 2L2 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+
           <form onSubmit={submit} className="delivery-form">
             <label htmlFor="pin-check">Your pincode</label>
             <div className="delivery-row">
