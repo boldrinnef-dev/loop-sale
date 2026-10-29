@@ -54,7 +54,7 @@ export default async function UnitPage({ params }: { params: Promise<{ slug: str
   const off = discountPercent(unit);
   const advance = unit.advanceAmount ?? 500;
   const balance = unit.salePrice - advance;
-  const defect = imageUrl(unit.defectImage, 280, 280);
+  const defect = imageUrl(unit.defectImage, 320, 320, 'contain');
 
   return (
     <main className="wrap unit">

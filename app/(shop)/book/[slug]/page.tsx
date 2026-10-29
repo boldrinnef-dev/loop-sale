@@ -46,7 +46,7 @@ export default async function BookPage({
   }
 
   const advance = unit.advanceAmount ?? 500;
-  const thumb = imageUrl(unit.images?.[0]?.ref, 160, 160);
+  const thumb = imageUrl(unit.images?.[0]?.ref, 180, 180, 'contain');
 
   return (
     <main className="wrap book-page">

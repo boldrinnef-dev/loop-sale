@@ -37,7 +37,7 @@ export default function Gallery({
   const touchX = useRef<number | null>(null);
 
   const count = images.length;
-  const main = imageUrl(images[active]?.ref, 1000, 750);
+  const main = imageUrl(images[active]?.ref, 1200, undefined, 'natural');
 
   const go = (delta: number) => {
     if (count < 2) return;

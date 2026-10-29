@@ -360,7 +360,7 @@ a:hover {
 .card-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 .card-body {
@@ -470,7 +470,9 @@ a:hover {
   gap: 8px;
 }
 .gallery-main {
-  aspect-ratio: 4 / 3;
+  /* No fixed ratio. A portrait phone photo of a tall fridge stays tall, and a
+     landscape shot of a sofa stays wide. Cropping either into one box was what
+     made the photos look zoomed in. */
   background: var(--fill);
   border-radius: var(--radius);
   overflow: hidden;
@@ -478,12 +480,26 @@ a:hover {
   align-items: center;
   justify-content: center;
   position: relative;
+  min-height: 240px;
+  max-height: 62vh;
+}
+@media (min-width: 860px) {
+  .gallery-main {
+    max-height: 560px;
+  }
 }
 .gallery-main img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 62vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   display: block;
+}
+@media (min-width: 860px) {
+  .gallery-main img {
+    max-height: 560px;
+  }
 }
 .thumbs {
   display: flex;
@@ -579,7 +595,7 @@ a:hover {
 .defect-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 

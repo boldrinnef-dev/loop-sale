@@ -4,7 +4,7 @@ import { discountPercent, rupees, type Unit } from '@/lib/units';
 
 export default function UnitCard({ unit }: { unit: Unit }) {
   const gone = unit.status !== 'available';
-  const src = imageUrl(unit.images?.[0]?.ref, 500, 500);
+  const src = imageUrl(unit.images?.[0]?.ref, 600, 600, 'contain');
   const off = discountPercent(unit);
 
   const inner = (

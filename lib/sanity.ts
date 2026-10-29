@@ -39,11 +39,28 @@ export async function sanityFetch<T>(
 /**
  * Build a CDN URL from an asset _ref such as
  * image-abc123...-1600x1200-jpg
+ *
+ * `fit` matters more than it looks. Godown photos are shot portrait on a
+ * phone, roughly 3:4, so cropping them into a square or a landscape box cuts
+ * the top and bottom off a tall fridge and reads as zoomed in.
+ *
+ *   contain  the whole unit, padded to the box with the page background.
+ *            Right for grid cards, where every tile must be the same shape.
+ *   natural  no box at all, the image keeps its own proportions.
+ *            Right for the main gallery photo.
+ *   crop     fills the box, cuts the edges. Only for small thumbnails, where
+ *            the shape matters more than the detail.
  */
+type Fit = 'contain' | 'natural' | 'crop';
+
+/** Matches --fill in globals.css, so padding is invisible against the page. */
+const PAD = 'e7e5de';
+
 export function imageUrl(
   ref: string | null | undefined,
   width: number,
-  height?: number
+  height?: number,
+  fit: Fit = 'crop'
 ): string | null {
   if (!ref || !projectId) return null;
 
@@ -51,12 +68,19 @@ export function imageUrl(
   if (parts.length < 4 || parts[0] !== 'image') return null;
 
   const [, assetId, dimensions, ext] = parts;
-  const query = new URLSearchParams({
-    w: String(width),
-    auto: 'format',
-    fit: 'crop'
-  });
-  if (height) query.set('h', String(height));
+  const query = new URLSearchParams({ w: String(width), auto: 'format' });
+
+  if (fit === 'natural') {
+    // Longest edge only. The image arrives at its own aspect ratio.
+    query.set('fit', 'max');
+  } else if (fit === 'contain') {
+    query.set('fit', 'fill');
+    query.set('bg', PAD);
+    if (height) query.set('h', String(height));
+  } else {
+    query.set('fit', 'crop');
+    if (height) query.set('h', String(height));
+  }
 
   return `https://cdn.sanity.io/images/${projectId}/${dataset}/${assetId}-${dimensions}.${ext}?${query.toString()}`;
 }
