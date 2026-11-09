@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { PINCODE_EVENT, STORAGE_KEY } from '@/lib/delivery-client';
-import { MAX_RADIUS_KM, quote, rupees, type DeliveryQuote } from '@/lib/delivery';
+import {
+  FREE_RADIUS_KM,
+  MAX_RADIUS_KM,
+  PER_KM,
+  quote,
+  rupees,
+  type DeliveryQuote
+} from '@/lib/delivery';
 
 /**
  * Shows what delivery costs to the pincode this visitor already gave, right
@@ -30,8 +37,8 @@ export default function DeliveryLine({ salePrice }: { salePrice: number }) {
   if (q.state === 'empty' || q.state === 'invalid') {
     return (
       <p className="delivery-line">
-        Delivery is free within 15 km of our Eroor godown, then Rs 25 a km. Check your
-        pincode at the top to see the exact fee.
+        Delivery is free within {FREE_RADIUS_KM} km of our Eroor godown, then{' '}
+        {rupees(PER_KM)} a km. Check your pincode at the top to see the exact fee.
       </p>
     );
   }
