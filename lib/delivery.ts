@@ -2,10 +2,14 @@
  * Delivery pricing, measured from the Eroor godown.
  *
  *   Up to 15 km      free
- *   15 to 40 km      Rs 25 per km beyond 15, rounded up
+ *   15 to 40 km      Rs 40 per km beyond 15, rounded up
  *   Beyond 40 km     we do not deliver
  *
- * The distances are a FIXED TABLE on purpose, not a live lookup. Rs 25 a km is
+ * Rate set to Rs 40/km at the team meeting of 9 Nov 2026. It was Rs 25/km from
+ * launch until then, so any quote given to a customer before 9 Nov was lower
+ * than the current one. Honour the old number on anything already promised.
+ *
+ * The distances are a FIXED TABLE on purpose, not a live lookup. Rs 40 a km is
  * a number customers argue about, so the same pincode must always produce the
  * same fee, and Eby has to be able to defend it on a call. A live API would
  * also give us a checkout that breaks when someone else's service is down.
@@ -23,7 +27,7 @@
 
 export const GODOWN = 'Eroor, Kochi';
 export const FREE_RADIUS_KM = 15;
-export const PER_KM = 25;
+export const PER_KM = 40;
 export const MAX_RADIUS_KM = 40;
 
 type Place = { area: string; km: number };
